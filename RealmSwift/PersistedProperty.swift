@@ -297,7 +297,7 @@ extension Persisted: OptionalCodingWrapper where Value: ExpressibleByNilLiteral 
  are valid), optional enum properties will return `nil`, and non-optional
  properties will abort the process.
  */
-public protocol PersistableEnum: _PersistableInsideOptional, RawRepresentable, CaseIterable, RealmEnum, RealmCollectionValue, MinMaxType, Comparable where RawValue: Comparable {
+public protocol PersistableEnum: _PersistableInsideOptional, RawRepresentable, CaseIterable, RealmEnum, _RealmCollectionValueInsideOptional, MinMaxType, Comparable where RawValue: Comparable {
 }
 
 extension PersistableEnum {
@@ -307,13 +307,17 @@ extension PersistableEnum {
     public static func < (lhs: Self, rhs: Self) -> Bool {
         return lhs.rawValue < rhs.rawValue
     }
+    /// :nodoc:
+    public static func _rlmDefaultValue() -> Self {
+        Self.allCases.first!
+    }
 }
 
 /// A type which can be indexed.
 ///
 /// This protocol is merely a tag and declaring additional types as conforming
 /// to it will simply result in runtime errors rather than compile-time errors.
-public protocol _Indexable {}
+@_marker public protocol _Indexable {}
 
 extension Persisted where Value.PersistedType: _Indexable {
     /// Declares an indexed property which is lazily initialized to the type's default value.
@@ -330,7 +334,7 @@ extension Persisted where Value.PersistedType: _Indexable {
 ///
 /// This protocol is merely a tag and declaring additional types as conforming
 /// to it will simply result in runtime errors rather than compile-time errors.
-public protocol _PrimaryKey {}
+@_marker public protocol _PrimaryKey {}
 
 extension Persisted where Value.PersistedType: _PrimaryKey {
     /// Declares the primary key property which is lazily initialized to the type's default value.
